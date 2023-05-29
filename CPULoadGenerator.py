@@ -139,14 +139,17 @@ def get_core_freq(c_num):
                    'Changing this value is strongly discouraged!',
               callback=__validate_sampling_interval)
 
-@click.option('--frequency', '-f',
-              type=int, default=-1, show_default=True,
-              help='Control cpu p-state by setting cpu frequency'
-              '-1: no change, 0: conservative ,1: powersave, 2: ondemand, 3: performance')
+# bottom
+@click.option('--min_freq', '-b',
+              type=str, show_default=True,multiple=True,
+              help='min cpu frequency')
+# top
+@click.option('--max_freq', '-t',
+              type=str, show_default=True,multiple=True,
+              help='max cpu frequency')
 
 
-
-def __main(core, cpu_load, duration, plot, sampling_interval,frequency):
+def __main(core, cpu_load, duration, plot, sampling_interval,min_freq,max_freq):
     if plot and duration < 0:
         raise click.BadOptionUsage(
             'Plot option can only be used with a fixed duration.')
@@ -156,28 +159,11 @@ def __main(core, cpu_load, duration, plot, sampling_interval,frequency):
     elif len(cpu_load) == 1:
         cpu_load = itertools.repeat(cpu_load[0], len(core))
         
-    if frequency==-1:
-        all_ava_freq = os.popen("cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies").readlines()[0].replace('\n','')
-        curr_freq = os.popen("cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq").readlines()[0].replace('\n','')
-        print(f"all avaliable frequency: {all_ava_freq}\ncurrent cpu frequency: {curr_freq}")
-    elif frequency==0:
-        for c in core:
-            res = os.popen(f"cpufreq-set -c {c} -g conservative").readlines()
-            print(f"core {c} freq: {get_core_freq(c)}, p-state: conservative")
-    elif frequency==1:
-       for c in core:
-            res = os.popen(f"cpufreq-set -c {c} -g powersave").readlines()
-            print(f"core {c} freq: {get_core_freq(c)}, p-state: powersave")
-    elif frequency==2:
-        for c in core:
-            res = os.popen(f"cpufreq-set -c {c} -g ondemand").readlines()
-            print(f"core {c} freq: {get_core_freq(c)}, p-state: ondemand")
-    elif frequency==3:
-        for c in core:
-            res = os.popen(f"cpufreq-set -c {c} -g performance").readlines()
-            print(f"core {c} freq: {get_core_freq(c)}, p-state: performance")
-    # filter out repeated core indexes
+    # print(core,'\n',min_freq,'\n',max_freq)
     core = list(set(core))
+    for idx,c in enumerate(core):
+        res = os.popen(f"cpupower --cpu {c} frequency-set --min {min_freq[idx]} --max {max_freq[idx]}").readlines()
+    # core = list(set(core))
 
     # disable signal handlers before spawning processes
     signal.signal(signal.SIGINT, signal.SIG_IGN)
