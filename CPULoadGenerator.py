@@ -163,6 +163,7 @@ def __main(core, cpu_load, duration, plot, sampling_interval,min_freq,max_freq):
     core = list(set(core))
     for idx,c in enumerate(core):
         res = os.popen(f"cpupower --cpu {c} frequency-set --min {min_freq[idx]} --max {max_freq[idx]}").readlines()
+        print(f'set cpu{c}, min frequency: {min_freq[idx]}, max frequency {max_freq[idx]}')
     # core = list(set(core))
 
     # disable signal handlers before spawning processes
