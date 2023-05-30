@@ -4,9 +4,9 @@ import time
 import os
 
 
-core = [48,52]
+core = [50,52]
 wnt_util = [0.15,0.95] 
-wnt_freq = [('1GHz','1.1GHz'),('2.5GHz','2.6GHz')]
+wnt_freq = [('0.9GHz','1.0GHz'),('2.4GHz','2.5GHz')]
 d = 120
 
 def get_cur_freq(cpus):
@@ -44,21 +44,24 @@ cmd += f'--duration {d}'
 # res = os.popen(cmd)
 
 print(cmd)
-
-for i in range(d+12):
+s = time.time()
+for i in range(1000):
+    e = time.time()
+    if e - s > d +15:
+        break
     real_util = psutil.cpu_percent(interval=0.5, percpu=True)
     print(len(real_util))
     real_freq = get_cur_freq(core)
     for idx,c in enumerate(core):
         try:
-            print(c,i,real_util[c],real_freq[idx])
+            print(c,int(e-s),real_util[c],real_freq[idx])
             
-            data[c]['idx'].append(i)
+            data[c]['idx'].append(int(e-s))
             data[c]['freq'].append(real_freq[idx])
             data[c]['util'].append(real_util[c])
         except:
             pass
-    time.sleep(1)
+    time.sleep(0.8)
 
 import json
 data['core'] = core

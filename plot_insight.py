@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import json
 
-data = json.loads(open("insight.json","r").read())
+data = json.loads(open("insight4.json","r").read())
 lns = []
 color = [
     'red',
@@ -25,7 +25,7 @@ ax2 = ax1.twinx()
 ax2.set_ylabel('utilization (%)')
 
 s,e = 0,50
-for idx,key in enumerate(['48','52']):
+for idx,key in enumerate(['50','52']):
     # if not isinstance(key,int):
     #     print(key,key.type)
     #     continue
@@ -36,5 +36,8 @@ for idx,key in enumerate(['48','52']):
 
 labs = [l.get_label() for l in lns]
 ax1.legend(lns, labs, loc=4)
-
-plt.savefig("t.png")
+title = ''
+for idx,key in enumerate(['50','52']):
+    title += f'cpu:{key} util:{data["wnt_util"][idx]} freq:[{data["wnt_freq"][idx][0]},{data["wnt_freq"][idx][1]}]\n'
+plt.title(title)
+plt.savefig("1.png")
